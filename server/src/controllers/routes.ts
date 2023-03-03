@@ -1,7 +1,7 @@
 import * as express from 'express';
 
-import {ApiMap, apiObject, HTTPStatus} from '../api/base';
-import {addCustomer, getCustomers, searchCustomers} from './controller';
+import {ApiMap, apiObject, Coordinate, Customer, HTTPStatus} from '../api/base';
+import {addCustomer, getCustomers, getInitialisedCoordinates, initializeServer, searchCustomers} from './controller';
 
 const apiPrefix = 'api';
 
@@ -43,7 +43,7 @@ function hostApi(app: express.Express, prefix: string[], api: ApiMap, checkers: 
                 const checkResult: string = checker(body, queryParameters);
                 if (checkResult) {
                     res.status(HTTPStatus.BadRequest);
-                    res.send(`Bad request: ${checkResult}`);
+                    res.send(`Bad request: ${checkResult}: ${body} ${queryParameters}`);
                 } else {
                     handler(body, queryParameters)
                         .then((value: any) => {
@@ -79,6 +79,10 @@ export function initRoutes(app: express.Express) {
             },
             search: {
                 GET: searchCustomers
+            },
+            initialise: {
+                POST: initializeServer,
+                GET: getInitialisedCoordinates
             }
         },
         apiObject);

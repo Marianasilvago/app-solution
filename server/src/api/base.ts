@@ -49,6 +49,7 @@ function asPartial<T>(p: T): Partial<T> {
 // tslint:enable:no-any
 
 const customer = obj({id: num, name: str});
+const coordinate: Coordinate = obj({x: num, y: num});
 export type Customer = typeof customer;
 // Query parameters have to be strings
 const partialCustomer = asPartial(obj({id: optional(str), name: optional(str)}));
@@ -60,6 +61,15 @@ export const apiObject = {
     search: {
         GET: fun(arr(customer), partialCustomer)
     },
+    initialise: {
+        POST: fun(coordinate, str),
+        GET: fun(coordinate),
+    }
 };
 
 export type ApiMap = typeof apiObject;
+
+export interface Coordinate {
+    x: number;
+    y: number;
+}
