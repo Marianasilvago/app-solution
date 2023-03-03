@@ -49,8 +49,10 @@ function asPartial<T>(p: T): Partial<T> {
 // tslint:enable:no-any
 
 const customer = obj({id: num, name: str});
-const coordinate: Coordinate = obj({x: num, y: num});
-const robot: Robot = obj({name: str});
+const grid: Grid = obj({topRightX: num, topRightY: num});
+const coordinates: Coordinate = obj({x: num, y: num});
+const dir: Direction = str as Direction;
+const robot: Robot = obj({name: str, coordinate: coordinates, direction: dir});
 export type Customer = typeof customer;
 // Query parameters have to be strings
 const partialCustomer = asPartial(obj({id: optional(str), name: optional(str)}));
@@ -64,8 +66,8 @@ export const apiObject = {
         GET: fun(arr(customer), partialCustomer)
     },
     initialise: {
-        POST: fun(coordinate, str),
-        GET: fun(coordinate),
+        POST: fun(grid, str),
+        GET: fun(grid),
     },
     robots: {
         POST: fun(robot, str),
@@ -80,11 +82,20 @@ export interface Coordinate {
     y: number;
 }
 
+export type Direction = 'N' | 'S' | 'E' | 'W';
+
 export interface Robot {
     name: string;
     coordinate: Coordinate;
+
+    direction: Direction;
 }
 
 export interface RobotMap {
-    [key: string]: Coordinate;
+    [key: string]: Robot;
+}
+
+export interface Grid {
+    topRightX: number;
+    topRightY: number;
 }

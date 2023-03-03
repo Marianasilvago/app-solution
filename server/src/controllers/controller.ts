@@ -1,9 +1,10 @@
-import {Coordinate, Customer, Robot, RobotMap} from '../api/base';
+import {Coordinate, Customer, Direction, Grid, Robot, RobotMap} from '../api/base';
+import {NewGrid, ValidateGrid} from '../api/grid';
 
 const customers: Customer[] = [];
 let id = 0;
 
-let savedRightCoords: Coordinate;
+let grid: Grid;
 
 const robots: RobotMap = {};
 
@@ -26,38 +27,51 @@ export function searchCustomers(params: { id?: string; name?: string }): Promise
     return new Promise(resolve => resolve(filteredCustomers));
 }
 
-export function initializeServer(coords: string): Promise<Coordinate> {
-    const upperRightCoords: number[] = coords.split(' ').map(Number).filter(isFinite);
-    // tslint:disable-next-line:no-magic-numbers
-    if (!upperRightCoords || upperRightCoords.length !== 2 || upperRightCoords[0] < 1 || upperRightCoords[1] < 1) {
+export function initializeServer(coords: string): Promise<Grid> {
+    const errString: string = ValidateGrid(coords);
+    if (errString.length > 0) {
         return Promise.reject('Error');
     }
 
-    savedRightCoords = {x: Number(upperRightCoords[0]), y: Number(upperRightCoords[1])};
+    grid = NewGrid(coords);
 
-    return new Promise(resolve => resolve(savedRightCoords));
+    return new Promise(resolve => resolve(grid));
 }
 
-export function getInitialisedCoordinates(): Promise<Coordinate> {
-    return new Promise(resolve => resolve(savedRightCoords));
+export function getInitialisedCoordinates(): Promise<Grid> {
+    return new Promise(resolve => resolve(grid));
 }
 
-export function createRobot(robotName: string): Promise<Robot> {
-    const start: Coordinate = {x: 0, y: 0};
-    const robot: Robot = {name: robotName, coordinate: start};
-    robots[robotName] = start;
+export function createRobot(robotInit: string): Promise<Robot> {
+    const roboParams = robotInit.split(' ');
+    // tslint:disable-next-line:no-magic-numbers
+    if (roboParams.length !== 2) {
+        return Promise.reject('Error');
+    }
+
+    const position = roboParams[1].split('');
+    // tslint:disable-next-line:no-magic-numbers
+    if (position.length !== 3 || Number(position[0]) < 1 || Number(position[1]) < 1) {
+        return Promise.reject('Error');
+    }
+
+    const start: Coordinate = {x: Number(position[0]), y: Number(position[1])};
+    // tslint:disable-next-line:no-magic-numbers
+    const initDirection: Direction = `${position[2]}` as Direction;
+    const robot: Robot = {name: roboParams[0], coordinate: start, direction: initDirection};
+    robots[roboParams[0]] = robot;
 
     return new Promise(resolve => resolve(robot));
 }
 
 export function getRobotPosition(params: { name?: string }): Promise<Robot> {
     const filteredRobots = Object.keys(robots)
-        .filter((robotName: string) => !params.name || `${robotName}` === params.name)
+        .filter((robotName: string) => !params.name || `${robotName}` === params.name);
 
     if (filteredRobots.length !== 1) {
         return Promise.reject('Error');
     }
     const roboName: string = filteredRobots[0];
 
-    return new Promise(resolve => resolve({name: roboName, coordinate: robots[roboName]}));
+    return new Promise(resolve => resolve(robots[roboName]));
 }

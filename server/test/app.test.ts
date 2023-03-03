@@ -15,7 +15,7 @@ describe('app server', () => {
 
 
             expect(response.status).toBe(200);
-            expect(response.text).toBe('{"message":{"x":5,"y":5}}');
+            expect(response.text).toBe('{"message":{"topRightX":5,"topRightY":5}}');
         });
 
         // @ts-ignore
@@ -33,6 +33,16 @@ describe('app server', () => {
             const response = await request.post('/api/initialise')
                 .set('Content-type', 'application/json')
                 .send({message: '5'});
+
+            expect(response.status).toBe(500);
+            expect(response.text).toBe('Internal server error');
+        });
+
+        // @ts-ignore
+        it('should return an error message for out of bounds', async () => {
+            const response = await request.post('/api/initialise')
+                .set('Content-type', 'application/json')
+                .send({message: '60 60'});
 
             expect(response.status).toBe(500);
             expect(response.text).toBe('Internal server error');
@@ -60,13 +70,14 @@ describe('app server', () => {
     });
 
     describe('create robot', () => {
+        // @ts-ignore
         it('should register robot', async () => {
             const response = await request.post('/api/robots')
                 .set('Content-type', 'application/json')
-                .send({message: 'R2D2'});
+                .send({message: 'R2D2 14E'});
 
             expect(response.status).toBe(200);
-            expect(response.text).toContain('R2D2');
+            expect(response.text).toBe('{"message":{"name":"R2D2","coordinate":{"x":1,"y":4},"direction":"E"}}');
         });
     });
 
@@ -74,14 +85,14 @@ describe('app server', () => {
         beforeEach(async () => {
             await request.post('/api/robots')
                 .set('Content-type', 'application/json')
-                .send({message: 'R2D2'});
+                .send({message: 'R2D2 14E'});
         });
         it('should return the position of a specific robot', async () => {
             const response = await request.get('/api/robots')
                 .query({name: 'R2D2'});
 
             expect(response.status).toBe(200);
-            expect(response.text).toBe('{"message":{"name":"R2D2","coordinate":{"x":0,"y":0}}}');
+            expect(response.text).toBe('{"message":{"name":"R2D2","coordinate":{"x":1,"y":4},"direction":"E"}}');
         });
 
         it('should return an error if no robots match the name', async () => {
