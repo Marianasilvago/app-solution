@@ -13,7 +13,6 @@ describe('app server', () => {
                 .set('Content-type', 'application/json')
                 .send({message: '5 5'});
 
-            console.log(response.text);
 
             expect(response.status).toBe(200);
             expect(response.text).toBe('{"message":{"x":5,"y":5}}');
@@ -54,6 +53,40 @@ describe('app server', () => {
             const response = await request.post('/api/initialise')
                 .set('Content-type', 'application/json')
                 .send({message: '5 av'});
+
+            expect(response.status).toBe(500);
+            expect(response.text).toBe('Internal server error');
+        });
+    });
+
+    describe('create robot', () => {
+        it('should register robot', async () => {
+            const response = await request.post('/api/robots')
+                .set('Content-type', 'application/json')
+                .send({message: 'R2D2'});
+
+            expect(response.status).toBe(200);
+            expect(response.text).toContain('R2D2');
+        });
+    });
+
+    describe('get robot', () => {
+        beforeEach(async () => {
+            await request.post('/api/robots')
+                .set('Content-type', 'application/json')
+                .send({message: 'R2D2'});
+        });
+        it('should return the position of a specific robot', async () => {
+            const response = await request.get('/api/robots')
+                .query({name: 'R2D2'});
+
+            expect(response.status).toBe(200);
+            expect(response.text).toBe('{"message":{"name":"R2D2","coordinate":{"x":0,"y":0}}}');
+        });
+
+        it('should return an error if no robots match the name', async () => {
+            const response = await request.get('/api/robots')
+                .query({name: 'R1D2'});
 
             expect(response.status).toBe(500);
             expect(response.text).toBe('Internal server error');

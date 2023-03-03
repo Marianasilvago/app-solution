@@ -1,9 +1,11 @@
-import {Coordinate, Customer} from '../api/base';
+import {Coordinate, Customer, Robot, RobotMap} from '../api/base';
 
 const customers: Customer[] = [];
 let id = 0;
 
 let savedRightCoords: Coordinate;
+
+const robots: RobotMap = {};
 
 export function getCustomers(): Promise<Customer[]> {
     return new Promise(resolve => resolve(customers));
@@ -38,4 +40,24 @@ export function initializeServer(coords: string): Promise<Coordinate> {
 
 export function getInitialisedCoordinates(): Promise<Coordinate> {
     return new Promise(resolve => resolve(savedRightCoords));
+}
+
+export function createRobot(robotName: string): Promise<Robot> {
+    const start: Coordinate = {x: 0, y: 0};
+    const robot: Robot = {name: robotName, coordinate: start};
+    robots[robotName] = start;
+
+    return new Promise(resolve => resolve(robot));
+}
+
+export function getRobotPosition(params: { name?: string }): Promise<Robot> {
+    const filteredRobots = Object.keys(robots)
+        .filter((robotName: string) => !params.name || `${robotName}` === params.name)
+
+    if (filteredRobots.length !== 1) {
+        return Promise.reject('Error');
+    }
+    const roboName: string = filteredRobots[0];
+
+    return new Promise(resolve => resolve({name: roboName, coordinate: robots[roboName]}));
 }

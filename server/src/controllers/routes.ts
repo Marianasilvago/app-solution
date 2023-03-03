@@ -1,7 +1,14 @@
 import * as express from 'express';
 
 import {ApiMap, apiObject, Coordinate, Customer, HTTPStatus} from '../api/base';
-import {addCustomer, getCustomers, getInitialisedCoordinates, initializeServer, searchCustomers} from './controller';
+import {
+    addCustomer,
+    createRobot,
+    getCustomers,
+    getInitialisedCoordinates, getRobotPosition,
+    initializeServer,
+    searchCustomers
+} from './controller';
 
 const apiPrefix = 'api';
 
@@ -83,7 +90,11 @@ export function initRoutes(app: express.Express) {
             initialise: {
                 POST: initializeServer,
                 GET: getInitialisedCoordinates
-            }
+            },
+            robots: {
+                POST: createRobot,
+                GET: getRobotPosition,
+            },
         },
         apiObject);
 }
