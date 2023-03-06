@@ -1,15 +1,7 @@
 import * as express from 'express';
 
-import {ApiMap, apiObject, Coordinate, Customer, HTTPStatus} from '../api/base';
-import {
-    addCustomer,
-    createRobot,
-    getCustomers,
-    getInitialisedCoordinates,
-    getRobotPosition,
-    initializeServer, moveRobot,
-    searchCustomers
-} from './controller';
+import {ApiMap, apiObject, HTTPStatus} from '../api/base';
+import {createRobot, getInitialisedCoordinates, getRobotPosition, initializeServer, moveRobot} from './controller';
 
 const apiPrefix = 'api';
 
@@ -81,13 +73,6 @@ export function initRoutes(app: express.Express) {
         app,
         [apiPrefix],
         {
-            customers: {
-                GET: getCustomers,
-                POST: addCustomer
-            },
-            search: {
-                GET: searchCustomers
-            },
             initialise: {
                 POST: initializeServer,
                 GET: getInitialisedCoordinates

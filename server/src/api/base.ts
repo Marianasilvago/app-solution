@@ -61,13 +61,6 @@ export type Customer = typeof customer;
 const partialCustomer = asPartial(obj({id: optional(str), name: optional(str)}));
 const robotRequest = asPartial(obj({name: str}));
 export const apiObject = {
-    customers: {
-        GET: fun(arr(customer)),
-        POST: fun(customer, str)
-    },
-    search: {
-        GET: fun(arr(customer), partialCustomer)
-    },
     initialise: {
         POST: fun(grid, str),
         GET: fun(grid),
