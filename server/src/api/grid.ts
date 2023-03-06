@@ -1,4 +1,4 @@
-import {Grid} from './base';
+import {Coordinate, Grid} from './base';
 
 export const MAX_COORDINATE_SIZE = 50;
 export const COORDINATE_PAIR_LENGTH = 2;
@@ -19,3 +19,25 @@ export const ValidateGrid = (coords: string): string => {
 
     return '';
 };
+
+let GridScents = [] as Coordinate[];
+
+export const ClearExistingScents = (): void => {
+    GridScents = [];
+};
+export const IsInExistingScents = (currentCoordinate: Coordinate): boolean => {
+    for (const scent of GridScents) {
+        if (scent.x === currentCoordinate.x && scent.y === currentCoordinate.y) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+export const AddToGridScents = (offTheWorldScent: Coordinate) => {
+    GridScents.push(offTheWorldScent);
+};
+
+export const IsOutOfGridBounds = (nextCoord: Coordinate, grid: Grid): boolean =>
+    (nextCoord.x > grid.topRightX || nextCoord.y > grid.topRightY);

@@ -5,8 +5,9 @@ import {
     addCustomer,
     createRobot,
     getCustomers,
-    getInitialisedCoordinates, getRobotPosition,
-    initializeServer,
+    getInitialisedCoordinates,
+    getRobotPosition,
+    initializeServer, moveRobot,
     searchCustomers
 } from './controller';
 
@@ -95,6 +96,9 @@ export function initRoutes(app: express.Express) {
                 POST: createRobot,
                 GET: getRobotPosition,
             },
+            moveRobot: {
+                POST: moveRobot
+            }
         },
         apiObject);
 }

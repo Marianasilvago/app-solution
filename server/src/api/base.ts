@@ -1,3 +1,5 @@
+import {Robot} from './robot';
+
 export type HTTPMethod = 'GET' | 'POST' | 'PUT';
 
 export enum HTTPStatus {
@@ -15,6 +17,7 @@ export interface ApiResponse<Res> {
 
 const num = ((p: any, path: string) => typeof p === 'number' ? undefined : (`${path}: not a number`)) as any as number;
 const str = ((p: any, path: string) => typeof p === 'string' ? undefined : (`${path}: not a string`)) as any as string;
+const boolVal = ((p: any, path: string) => typeof p === 'boolean' ? undefined : (`${path}: not a boolean`)) as any as boolean;
 
 function fun<T, TS extends [any?, any?]>(returns: T, ...takes: TS) {
     return ((...t: TS) => takes
@@ -52,11 +55,11 @@ const customer = obj({id: num, name: str});
 const grid: Grid = obj({topRightX: num, topRightY: num});
 const coordinates: Coordinate = obj({x: num, y: num});
 const dir: Direction = str as Direction;
-const robot: Robot = obj({name: str, coordinate: coordinates, direction: dir});
+const robot: Robot = obj({name: str, coordinate: coordinates, direction: dir, isLost: boolVal, lostAt: coordinates});
 export type Customer = typeof customer;
 // Query parameters have to be strings
 const partialCustomer = asPartial(obj({id: optional(str), name: optional(str)}));
-const robotRequest = asPartial(obj({name: optional(str)}));
+const robotRequest = asPartial(obj({name: str}));
 export const apiObject = {
     customers: {
         GET: fun(arr(customer)),
@@ -72,6 +75,9 @@ export const apiObject = {
     robots: {
         POST: fun(robot, str),
         GET: fun(robot, robotRequest),
+    },
+    moveRobot: {
+        POST: fun(robot, str),
     }
 };
 
@@ -83,13 +89,6 @@ export interface Coordinate {
 }
 
 export type Direction = 'N' | 'S' | 'E' | 'W';
-
-export interface Robot {
-    name: string;
-    coordinate: Coordinate;
-
-    direction: Direction;
-}
 
 export interface RobotMap {
     [key: string]: Robot;
